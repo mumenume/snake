@@ -62,7 +62,7 @@ class SnakeEnv(gym.Env):
             self.world = self.reset()
         return self.world.get_observation(), reward, done, snake
 
-    def reset(self):#, ):
+    def reset(self):
         """
         Reset environment to the initial state
         @return: initial observation
