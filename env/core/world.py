@@ -126,8 +126,8 @@ class World(object):
             except TypeError:
                 return
             # Check if snake is outside bounds
-            end = len(self.world)-1
-            if (new_snake_head[0] > end) or (new_snake_head[1] > end) or (new_snake_head[0] < 0) or (new_snake_head[1] < 0):
+            end = len(self.world)-2
+            if (new_snake_head[0] > end) or (new_snake_head[1] > end) or (new_snake_head[0] < 1) or (new_snake_head[1] < 1):
                 self.snake.alive = False
             # Check if snake eats itself
             elif new_snake_head in self.snake.blocks[1:]:
@@ -136,7 +136,7 @@ class World(object):
             if (new_snake_head[0] == self.food_position[0]) and (new_snake_head[1] == self.food_position[1]):
 
                 # Remove old food
-                chosen_position = 0
+                self.world[self.food_position[0], self.food_position[1]] = 0
 
                 # Add tail again
                 tail = self.snake.blocks[-1]
@@ -154,27 +154,10 @@ class World(object):
         # Adding new food
         if new_food_needed:
             self.init_food()
-            print('FOOD', self.FOOD)
 
         return reward, done, self.snake.blocks
 
-# w = World((25, 25), True, (5, 5), 2, (6, 5))
-#
-#
-# print('First move', w.move_snake(2))
-# print('Snake', w.snake.blocks)
-# print('Alive after move?', w.snake.alive)
-# print('Second move', w.move_snake(1))
-# print('Snake', w.snake.blocks)
-# print('Alive after move?', w.snake.alive)
-# print('Third move', w.move_snake(1))
-# print('Snake', w.snake.blocks)
-# print('Alive after move?', w.snake.alive)
-# print('Fourth move', w.move_snake(1))
-# print('Snake', w.snake.blocks)
-# print('Alive after move?', w.snake.alive)
-
-
+# w = World((25, 25), False, (5, 5), 2, (6, 5))
 
 # DIRECTIONS = [np.array([-1, 0]),
 #               np.array([0, 1]),
