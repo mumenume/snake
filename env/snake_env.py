@@ -59,7 +59,7 @@ class SnakeEnv(gym.Env):
 
         else:
             # Disable interactions if snake dead
-            self.world = self.reset()
+            return
         return self.world.get_observation(), reward, done, snake
 
     def reset(self):
@@ -68,7 +68,6 @@ class SnakeEnv(gym.Env):
         @return: initial observation
         """
         # Reset step counters
-        reward = 0
         self.current_step = 0
         # Set 'alive' flag
         self.alive = True

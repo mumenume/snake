@@ -5,6 +5,7 @@ from settings.constants import DIRECTIONS, SNAKE_SIZE, DEAD_REWARD, \
     MOVE_REWARD, EAT_REWARD, FOOD_BLOCK, WALL
 from env.core.snake import Snake
 
+
 class World(object):
     def __init__(self, size, custom, start_position, start_direction_index, food_position):
         """
@@ -52,7 +53,7 @@ class World(object):
             b = self.size[1] - SNAKE_SIZE
             start_position = (random.randint(s, a), random.randint(s, b))
             # choose a random direction index
-            start_direction_index = random.randint(0,3)
+            start_direction_index = random.randint(0, 3)
             new_snake = Snake(start_position, start_direction_index, SNAKE_SIZE)
         else:
             new_snake = Snake(self.start_position, self.start_direction_index, SNAKE_SIZE)
@@ -75,9 +76,12 @@ class World(object):
         if not self.custom:
             # Choose a random position from available
             chosen_position = random.choice(available_food_positions)
-            self.food_position = chosen_position
-        else:
+
+        elif self.food_position in self.available_food_positions:
             chosen_position = self.food_position
+        else:
+            self.custom = False
+            self.init_food()
 
             # Code needed for checking your project. Just leave it as it is
             try:
@@ -89,8 +93,6 @@ class World(object):
                     chosen_position = (self.food_position[0] - 1, self.food_position[1] + 1)
                 available_food_positions.remove(chosen_position)
         self.world[chosen_position[0], chosen_position[1]] = self.FOOD
-
-
 
 
     def get_observation(self):
@@ -118,33 +120,33 @@ class World(object):
         # check if snake is alive
         if self.snake.alive:
             # perform a step (from Snake class)
+            new_snake_head, old_snake_tail = self.snake.step(action)
 
-            try:
-                result = self.snake.step(action)
-                old_snake_tail = result[1]
-                new_snake_head = result[0]
-            except TypeError:
-                return
+            # try:
+            #     result = self.snake.step(action)
+            #     old_snake_tail = result[1]
+            #     new_snake_head = result[0]
+            # except TypeError:
+            #     return
+
             # Check if snake is outside bounds
-            end = len(self.world)-2
-            if (new_snake_head[0] > end) or (new_snake_head[1] > end) or (new_snake_head[0] < 1) or (new_snake_head[1] < 1):
+            if self.world[new_snake_head[0], new_snake_head[1]] == self.WALL:
                 self.snake.alive = False
+
             # Check if snake eats itself
             elif new_snake_head in self.snake.blocks[1:]:
                 self.snake.alive = False
+
             #  Check if snake eats the food
-            if (new_snake_head[0] == self.food_position[0]) and (new_snake_head[1] == self.food_position[1]):
-
+            if self.world[new_snake_head[0], new_snake_head[1]] == self.FOOD:
                 # Remove old food
-                self.world[self.food_position[0], self.food_position[1]] = 0
-
+                self.world[new_snake_head[0], new_snake_head[1]] = 0
                 # Add tail again
-                tail = self.snake.blocks[-1]
-                direction = DIRECTIONS[self.snake.current_direction_index]
                 self.snake.blocks.append((old_snake_tail[0], old_snake_tail[1]))
                 # Request to place new food
                 new_food_needed = True
-                reward += EAT_REWARD
+                reward = self.EAT_REWARD
+
             elif self.snake.alive:
                 # Didn't eat anything, move reward
                 reward = self.MOVE_REWARD
@@ -154,10 +156,17 @@ class World(object):
         # Adding new food
         if new_food_needed:
             self.init_food()
-
         return reward, done, self.snake.blocks
 
-# w = World((25, 25), False, (5, 5), 2, (6, 5))
+# w = World((25, 25), True, (5, 5), 2, (6, 5))
+# print(w.food_position)
+#
+# print(w.move_snake(2))
+# print(w.food_position)
+# print(w.move_snake(2))
+# print(w.food_position)
+# print(w.move_snake(2))
+# print(w.food_position)
 
 # DIRECTIONS = [np.array([-1, 0]),
 #               np.array([0, 1]),
